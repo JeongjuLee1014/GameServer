@@ -44,7 +44,7 @@ namespace GameServer.Services
             throw new Exception("Access token not found in response");
         }
 
-        public async Task<long> RequestUserIdFromKakao(string access_token)
+        public async Task<string> RequestUserIdFromKakao(string access_token)
         {
             string url = "https://kapi.kakao.com/v2/user/me";
 
@@ -60,7 +60,7 @@ namespace GameServer.Services
 
             if (responseJson != null && responseJson.TryGetValue("id", out var idElement))
             {
-                return idElement.GetInt64();
+                return idElement.GetInt64().ToString();
             }
 
             throw new Exception("Id not found in response");
