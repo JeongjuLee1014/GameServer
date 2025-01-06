@@ -124,7 +124,7 @@ namespace GameServer.Services
                 var responseDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseElement.GetRawText());
                 if (responseDetails != null && responseDetails.TryGetValue("id", out var idElement))
                 {
-                    return idElement.GetString()!);
+                    return idElement.GetString()!;
                 }
             }
 
