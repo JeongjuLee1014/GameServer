@@ -39,6 +39,9 @@ namespace kakaoTemp.Controllers
                 + "&redirect_uri=" + redirect_uri
                 + "&state=" + state;
 
+            return Redirect(redirectUrl);
+        }
+
         [HttpGet("google")]
         public IActionResult RedirectToGoogleLogin([FromQuery] string session_id)
         {
