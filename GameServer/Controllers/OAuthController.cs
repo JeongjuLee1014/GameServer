@@ -27,7 +27,7 @@ namespace GameServer.Controllers
         }
 
         [HttpGet("kakao")]
-        public async Task<IActionResult> HandleOAuthRedirect([FromQuery] string code)
+        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string code)
         {
             string access_token = await _oauthService.RequestAccessTokenFromKakao(code);
             string user_id = await _oauthService.RequestUserIdFromKakao(access_token);
@@ -47,6 +47,24 @@ namespace GameServer.Controllers
             return Content(loginCompleteResponse, "text/html");
         }
 
+        [HttpGet("naver")]
+        public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string code)
+        {
+            string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
+            string user_id = await _oauthService.RequestUserIdFromNaver(access_token);
+            user_id = (((int)(Platform.Naver)).ToString() + user_id.ToString());
+            string sessionId = HttpContext.Session.GetString("SessionId")!;
+            if (await isJoined(user_id))
+            {
+                await Login(user_id, sessionId);
+            }
+            else
+            {
+                await Join(user_id, sessionId);
+            }
+            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
+            return Content(loginCompleteResponse, "text/html");
+        }
         public async Task<bool> isJoined(string user_id)
         {
             return await _gameContext.Users.AnyAsync(user => user.Id == user_id);
