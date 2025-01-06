@@ -11,7 +11,7 @@ namespace GameServer.Services
             _httpClient = httpClient;
         }
 
-        public async Task<string> RequestAccessToken(string authorization_code)
+        public async Task<string> RequestAccessTokenFromKakao(string authorization_code)
         {
             const string grant_type = "authorization_code";
             const string client_id = "49209eb683ce3a79ad35d14c2dc39b60";
@@ -44,7 +44,7 @@ namespace GameServer.Services
             throw new Exception("Access token not found in response");
         }
 
-        public async Task<long> RequestUserId(string access_token)
+        public async Task<long> RequestUserIdFromKakao(string access_token)
         {
             string url = "https://kapi.kakao.com/v2/user/me";
 
