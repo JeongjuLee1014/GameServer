@@ -29,8 +29,8 @@ namespace GameServer.Controllers
         [HttpGet("kakao")]
         public async Task<IActionResult> HandleOAuthRedirect([FromQuery] string code)
         {
-            string access_token = await _oauthService.RequestAccessToken(code);
-            long user_id = await _oauthService.RequestUserId(access_token);
+            string access_token = await _oauthService.RequestAccessTokenFromKakao(code);
+            long user_id = await _oauthService.RequestUserIdFromKakao(access_token);
             user_id = long.Parse(((int)(Platform.Kakao)).ToString() + user_id.ToString());
             string sessionId = HttpContext.Session.GetString("SessionId")!;
 
