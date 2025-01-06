@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GameServer.Models;
 
@@ -41,6 +36,19 @@ namespace GameServer.Controllers
             return user;
         }
 
+        [HttpGet("session/{sessionId}")]
+        public ActionResult<User> GetUser(string sessionId)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.SessionId == sessionId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
+
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -67,6 +75,32 @@ namespace GameServer.Controllers
                 {
                     throw;
                 }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("session/{sessionId}")]
+        public async Task<IActionResult> PutUser(string sessionId, User user)
+        {
+            // Find the user with the given sessionId
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
+
+            if (existingUser == null)
+            {
+                return NotFound(new { Message = "User not found." });
+            }
+
+            existingUser.NickName = user.NickName;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { Message = "An error occurred while updating the user." });
             }
 
             return NoContent();
