@@ -23,6 +23,22 @@ namespace kakaoTemp.Controllers
             return Redirect(redirectUrl);
         }
 
+        [HttpGet("naver")]
+        public IActionResult RedirectToNaverLogin([FromQuery] string session_id)
+        {
+            HttpContext.Session.SetString("SessionId", session_id);
+
+            const string client_id = "pKaHA3PgKs1zqls08bAy";
+            const string redirect_uri = "https://localhost:7032/oauth/naver";
+            const string response_type = "code";
+            const string state = "1234";
+
+            const string redirectUrl = "https://nid.naver.com/oauth2.0/authorize"
+                + "?response_type=" + response_type
+                + "&client_id=" + client_id
+                + "&redirect_uri=" + redirect_uri
+                + "&state=" + state;
+
         [HttpGet("google")]
         public IActionResult RedirectToGoogleLogin([FromQuery] string session_id)
         {
