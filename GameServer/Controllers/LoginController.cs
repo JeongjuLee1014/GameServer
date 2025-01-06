@@ -22,5 +22,24 @@ namespace kakaoTemp.Controllers
 
             return Redirect(redirectUrl);
         }
+
+        [HttpGet("google")]
+        public IActionResult RedirectToGoogleLogin([FromQuery] string session_id)
+        {
+            HttpContext.Session.SetString("SessionId", session_id);
+
+            const string client_id = "631548192030-u31u1vn5o4343nh85ksuvrge72l6aq9s.apps.googleusercontent.com";
+            const string redirect_uri = "https://localhost:7032/oauth/google";
+            const string response_type = "code";
+            const string scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
+
+            string redirectUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
+            "?client_id=" + client_id +
+            "&redirect_uri=" + redirect_uri +
+            "&response_type=" + response_type +
+            "&scope=" + scope;
+
+            return Redirect(redirectUrl);
+        }
     }
 }
