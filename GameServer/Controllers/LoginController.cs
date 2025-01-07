@@ -16,14 +16,14 @@ namespace kakaoTemp.Controllers
         [HttpGet("kakao")]
         public IActionResult RedirectToKakaoLogin([FromQuery] string sessionID)
         {
-            const string client_id = ApiConstants.KAKAO_APP_KEY;
-            const string redirect_uri = ApiConstants.SERVER_URL + "/oauth/kakao";
-            const string response_type = "code";
+            const string clientId = ApiConstants.KAKAO_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/kakao";
+            const string responseType = "code";
 
             const string redirectUrl = "https://kauth.kakao.com/oauth/authorize" +
-                "?client_id=" + client_id +
-                "&redirect_uri=" + redirect_uri +
-                "&response_type=" + response_type;
+                "?client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&response_type=" + responseType;
 
             return RedirectTo(redirectUrl, sessionID);
         }
@@ -31,15 +31,15 @@ namespace kakaoTemp.Controllers
         [HttpGet("naver")]
         public IActionResult RedirectToNaverLogin([FromQuery] string sessionID)
         {
-            const string client_id = ApiConstants.NAVER_APP_KEY;
-            const string redirect_uri = ApiConstants.SERVER_URL + "/oauth/naver";
-            const string response_type = "code";
+            const string clientId = ApiConstants.NAVER_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/naver";
+            const string responseType = "code";
             const string state = "1234";
 
             const string redirectUrl = "https://nid.naver.com/oauth2.0/authorize" +
-                "?response_type=" + response_type +
-                "&client_id=" + client_id +
-                "&redirect_uri=" + redirect_uri +
+                "?response_type=" + responseType +
+                "&client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
                 "&state=" + state;
 
             return RedirectTo(redirectUrl, sessionID);
@@ -48,15 +48,15 @@ namespace kakaoTemp.Controllers
         [HttpGet("google")]
         public IActionResult RedirectToGoogleLogin([FromQuery] string sessionID)
         {
-            const string client_id = ApiConstants.GOOGLE_APP_KEY;
-            const string redirect_uri = ApiConstants.SERVER_URL + "/oauth/google";
-            const string response_type = "code";
+            const string clientId = ApiConstants.GOOGLE_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/google";
+            const string responseType = "code";
             const string scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
 
-            string redirectUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
-                "?client_id=" + client_id +
-                "&redirect_uri=" + redirect_uri +
-                "&response_type=" + response_type +
+            const string redirectUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
+                "?client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&response_type=" + responseType +
                 "&scope=" + scope;
 
             return RedirectTo(redirectUrl, sessionID);
