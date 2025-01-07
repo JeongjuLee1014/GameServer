@@ -6,38 +6,26 @@ namespace GameServer.Services
     public class OAuthService
     {
         private readonly HttpClient _httpClient;
-        //private readonly string _googleClientId;
-        //private readonly string _googleClientSecret;
-
-        //public OAuthService(HttpClient httpClient)
-        //{
-        //    _httpClient = httpClient;
-
-
-        //    // 환경 변수에서 Client ID, Secret 읽기
-        //    _googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")!;
-        //    _googleClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")!;
-
-        //    if (string.IsNullOrEmpty(_googleClientId) || string.IsNullOrEmpty(_googleClientSecret))
-        //    {
-        //        throw new Exception("Google OAuth 환경 변수가 설정되지 않았습니다.");
-        //    }
-        //}
-
-        public async Task<string> RequestAccessTokenFromKakao(string authorization_code)
+        
+        public OAuthService(HttpClient httpClient)
         {
-            const string grant_type = "authorization_code";
-            const string client_id = ApiConstants.KAKAO_APP_KEY;
-            const string redirect_uri = ApiConstants.SERVER_URL + "/oauth/kakao";
+            _httpClient = httpClient;
+        }
+
+        public async Task<string> RequestAccessTokenFromKakao(string authorizationCode)
+        {
+            const string grantType = "authorization_code";
+            const string clientId = ApiConstants.KAKAO_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/kakao";
 
             string url = "https://kauth.kakao.com/oauth/token";
 
             var payload = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("grant_type", grant_type),
-                new KeyValuePair<string, string>("client_id", client_id),
-                new KeyValuePair<string, string>("redirect_uri", redirect_uri),
-                new KeyValuePair<string, string>("code", authorization_code),
+                new KeyValuePair<string, string>("grant_type", grantType),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                new KeyValuePair<string, string>("code", authorizationCode),
             };
 
             var content = new FormUrlEncodedContent(payload);
@@ -57,13 +45,12 @@ namespace GameServer.Services
             throw new Exception("Access token not found in response");
         }
 
-
-        public async Task<string> RequestUserIdFromKakao(string access_token)
+        public async Task<string> RequestUserIdFromKakao(string accessToken)
         {
             string url = "https://kapi.kakao.com/v2/user/me";
 
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", access_token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _httpClient.GetAsync(url);
 
@@ -80,23 +67,23 @@ namespace GameServer.Services
             throw new Exception("Id not found in response");
         }
 
-        public async Task<string> RequestAccessTokenFromGoogle(string authorization_code)
+        public async Task<string> RequestAccessTokenFromGoogle(string authorizationCode)
         {
-            const string grant_type = "authorization_code";
-            const string client_id = ApiConstants.GOOGLE_APP_KEY;
-            const string client_secret = ApiConstants.GOOGLE_CLIENT_SECRET;
-            const string redirect_uri = ApiConstants.SERVER_URL + "/oauth/google";
+            const string grantType = "authorization_code";
+            const string clientId = ApiConstants.GOOGLE_APP_KEY;
+            const string clientSecret = ApiConstants.GOOGLE_CLIENT_SECRET;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/google";
 
             string url = "https://oauth2.googleapis.com/token";
 
             // key-value 형식의 데이터
             var payload = new List<KeyValuePair<string, string>>()
             {
-                new KeyValuePair<string, string>("grant_type", grant_type),
-                new KeyValuePair<string, string>("client_id", client_id),
-                new KeyValuePair<string, string>("client_secret", client_secret),
-                new KeyValuePair<string, string>("redirect_uri", redirect_uri),
-                new KeyValuePair<string, string>("code", authorization_code)
+                new KeyValuePair<string, string>("grant_type", grantType),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                new KeyValuePair<string, string>("code", authorizationCode)
             };
 
             var content = new FormUrlEncodedContent(payload);
@@ -116,12 +103,12 @@ namespace GameServer.Services
             throw new Exception("Access token not found in response");
         }
 
-        public async Task<string> RequestUserIdFromGoogle(string access_token)
+        public async Task<string> RequestUserIdFromGoogle(string accessToken)
         {
             string url = "https://www.googleapis.com/userinfo/v2/me";
 
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", access_token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _httpClient.GetAsync(url);
 
@@ -138,23 +125,23 @@ namespace GameServer.Services
             throw new Exception("Id not found in response");
         }
 
-        public async Task<string> RequestAccessTokenFromNaver(string authorization_code)
+        public async Task<string> RequestAccessTokenFromNaver(string authorizationCode)
         {
             // AccessToken 추출
-            const string grant_type = "authorization_code";
-            const string client_id = ApiConstants.NAVER_APP_KEY;
-            const string client_secret = ApiConstants.NAVER_CLIENT_SECRET;
-            const string redirect_uri = ApiConstants.SERVER_URL + "/oauth/naver";
+            const string grantType = "authorization_code";
+            const string clientId = ApiConstants.NAVER_APP_KEY;
+            const string clientSecret = ApiConstants.NAVER_CLIENT_SECRET;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/naver";
 
             string url = "https://nid.naver.com/oauth2.0/token";
 
             var payload = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("grant_type", grant_type),
-                new KeyValuePair<string, string>("client_id", client_id),
-                new KeyValuePair<string, string>("client_secret", client_secret),
-                new KeyValuePair<string, string>("redirect_uri", redirect_uri),
-                new KeyValuePair<string, string>("code", authorization_code),
+                new KeyValuePair<string, string>("grant_type", grantType),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                new KeyValuePair<string, string>("code", authorizationCode),
             };
 
             var content = new FormUrlEncodedContent(payload);
@@ -174,14 +161,13 @@ namespace GameServer.Services
             throw new Exception("Access token not found in response");
         }
 
-        public async Task<string> RequestUserIdFromNaver(string access_token)
+        public async Task<string> RequestUserIdFromNaver(string accessToken)
         {
             // UserId 추출
             string url = "https://openapi.naver.com/v1/nid/me";
 
-
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", access_token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _httpClient.GetAsync(url);
 
