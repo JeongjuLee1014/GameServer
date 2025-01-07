@@ -100,7 +100,7 @@ namespace GameServer.Controllers
             var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
             return Content(loginCompleteResponse, "text/html");
         }
-        public async Task<bool> isJoined(string user_id)
+        public async Task<bool> isJoined(string userId)
         {
             return await _gameContext.Users.AnyAsync(user => user.Id == userId);
         }
