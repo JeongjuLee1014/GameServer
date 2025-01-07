@@ -12,14 +12,6 @@ namespace GameServer.Controllers
         private readonly OAuthService _oauthService;
         private readonly GameContext _gameContext;
 
-        // 로그인 플랫폼에 대한 상수 정의
-        public enum Platform
-        {
-            Kakao = 1,
-            Google,
-            Naver
-        }
-
         public OAuthController(OAuthService oauthService, GameContext gameContext)
         {
             _oauthService = oauthService;
@@ -31,14 +23,11 @@ namespace GameServer.Controllers
         {
             string accessToken = await _oauthService.RequestAccessTokenFromKakao(code);
             string userId = await _oauthService.RequestUserIdFromKakao(accessToken);
-
-            userId = ((int)(Platform.Kakao)).ToString() + userId.ToString();
             
             await ProcessUserLogin(userId);
             
             return await ReturnLoginCompleteResponse();
         }
-
 
         [HttpGet("google")]
         public async Task<IActionResult> HandleGoogleOAuthRedirect([FromQuery] string code)
@@ -46,21 +35,16 @@ namespace GameServer.Controllers
             string access_token = await _oauthService.RequestAccessTokenFromGoogle(code);
             string userId = await _oauthService.RequestUserIdFromGoogle(access_token);
             
-            userId = ((int)(Platform.Google)).ToString() + userId.ToString();
-            
             await ProcessUserLogin(userId);
             
             return await ReturnLoginCompleteResponse();
         }
-
 
         [HttpGet("naver")]
         public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string code)
         {
             string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
             string userId = await _oauthService.RequestUserIdFromNaver(access_token);
-            
-            userId = (((int)(Platform.Naver)).ToString() + userId.ToString());
             
             await ProcessUserLogin(userId);
             

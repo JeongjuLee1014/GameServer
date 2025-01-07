@@ -1,12 +1,19 @@
-﻿using System.Text.Json;
-using dotenv.net;
+﻿using GameServer.Models;
+using System.Text.Json;
 
 namespace GameServer.Services
 {
     public class OAuthService
     {
         private readonly HttpClient _httpClient;
-        
+
+        public enum Platform
+        {
+            Kakao = 1,
+            Google,
+            Naver
+        }
+
         public OAuthService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -61,7 +68,7 @@ namespace GameServer.Services
 
             if (responseJson != null && responseJson.TryGetValue("id", out var idElement))
             {
-                return idElement.GetInt64().ToString();
+                return ((int)(Platform.Kakao)).ToString() + idElement.GetInt64().ToString();
             }
 
             throw new Exception("Id not found in response");
@@ -119,7 +126,7 @@ namespace GameServer.Services
 
             if (responseJson != null && responseJson.TryGetValue("id", out var idElement))
             {
-                return idElement.GetString()!;
+                return ((int)(Platform.Google)).ToString() + idElement.GetString()!;
             }
 
             throw new Exception("Id not found in response");
@@ -181,7 +188,7 @@ namespace GameServer.Services
                 var responseDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseElement.GetRawText());
                 if (responseDetails != null && responseDetails.TryGetValue("id", out var idElement))
                 {
-                    return idElement.GetString()!;
+                    return ((int)(Platform.Naver)).ToString() + idElement.GetString()!;
                 }
 
             }
