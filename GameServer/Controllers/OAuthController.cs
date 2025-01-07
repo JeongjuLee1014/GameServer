@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using GameServer.Models;
+﻿using GameServer.Models;
 using GameServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,10 +26,45 @@ namespace GameServer.Controllers
             _gameContext = gameContext;
         }
 
-        public async Task<IActionResult> ReturnLoginCompleteResponse()
+        [HttpGet("kakao")]
+        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string code)
         {
-            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
-            return Content(loginCompleteResponse, "text/html");
+            string accessToken = await _oauthService.RequestAccessTokenFromKakao(code);
+            string userId = await _oauthService.RequestUserIdFromKakao(accessToken);
+
+            userId = ((int)(Platform.Kakao)).ToString() + userId.ToString();
+            
+            await ProcessUserLogin(userId);
+            
+            return await ReturnLoginCompleteResponse();
+        }
+
+
+        [HttpGet("google")]
+        public async Task<IActionResult> HandleGoogleOAuthRedirect([FromQuery] string code)
+        {
+            string access_token = await _oauthService.RequestAccessTokenFromGoogle(code);
+            string userId = await _oauthService.RequestUserIdFromGoogle(access_token);
+            
+            userId = ((int)(Platform.Google)).ToString() + userId.ToString();
+            
+            await ProcessUserLogin(userId);
+            
+            return await ReturnLoginCompleteResponse();
+        }
+
+
+        [HttpGet("naver")]
+        public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string code)
+        {
+            string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
+            string userId = await _oauthService.RequestUserIdFromNaver(access_token);
+            
+            userId = (((int)(Platform.Naver)).ToString() + userId.ToString());
+            
+            await ProcessUserLogin(userId);
+            
+            return await ReturnLoginCompleteResponse();
         }
 
         public async Task ProcessUserLogin(string userId)
@@ -47,59 +81,12 @@ namespace GameServer.Controllers
             }
         }
 
-        [HttpGet("kakao")]
-        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string code)
+        public async Task<IActionResult> ReturnLoginCompleteResponse()
         {
-            string accessToken = await _oauthService.RequestAccessTokenFromKakao(code);
-            string userId = await _oauthService.RequestUserIdFromKakao(accessToken);
-            userId = ((int)(Platform.Kakao)).ToString() + userId.ToString();
-
-            await ProcessUserLogin(userId);
-
-            return await ReturnLoginCompleteResponse();
-        }
-
-
-        [HttpGet("google")]
-        public async Task<IActionResult> HandleGoogleOAuthRedirect([FromQuery] string code)
-        {
-            string access_token = await _oauthService.RequestAccessTokenFromGoogle(code);
-            string user_id = await _oauthService.RequestUserIdFromGoogle(access_token);
-            user_id = ((int)(Platform.Google)).ToString() + user_id.ToString();
-            string sessionId = HttpContext.Session.GetString("SessionId")!;
-
-            if (await isJoined(user_id))
-            {
-                await Login(user_id, sessionId);
-            }
-            else
-            {
-                await Join(user_id, sessionId);
-            }
-
             var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
             return Content(loginCompleteResponse, "text/html");
         }
 
-
-        [HttpGet("naver")]
-        public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string code)
-        {
-            string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
-            string user_id = await _oauthService.RequestUserIdFromNaver(access_token);
-            user_id = (((int)(Platform.Naver)).ToString() + user_id.ToString());
-            string sessionId = HttpContext.Session.GetString("SessionId")!;
-            if (await isJoined(user_id))
-            {
-                await Login(user_id, sessionId);
-            }
-            else
-            {
-                await Join(user_id, sessionId);
-            }
-            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
-            return Content(loginCompleteResponse, "text/html");
-        }
         public async Task<bool> isJoined(string userId)
         {
             return await _gameContext.Users.AnyAsync(user => user.Id == userId);
@@ -107,7 +94,6 @@ namespace GameServer.Controllers
 
         public async Task<IActionResult> Login(string userId, string sessionId)
         {
-            // user의 session_id 값을 업데이트
             var user = await _gameContext.Users.FindAsync(userId);
 
             if (user == null)
@@ -138,13 +124,13 @@ namespace GameServer.Controllers
             return NoContent();
         }
 
-        public async Task Join(string userId, string session_id)
+        public async Task Join(string userId, string sessionId)
         {
             await _gameContext.Users.AddAsync(new User
             {
                 Id = userId,
                 NickName = "",
-                SessionId = session_id
+                SessionId = sessionId
             });
 
             await _gameContext.SaveChangesAsync();
