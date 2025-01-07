@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 ### 환경변수
 .env
+
+### 앱 키
+ApiConstants.cs
