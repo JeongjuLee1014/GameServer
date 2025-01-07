@@ -1,6 +1,7 @@
 using GameServer.Models;
 using GameServer.Services;
 using Microsoft.EntityFrameworkCore;
+using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,11 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+
+// .env 파일 로드
+//DotEnv.Load();
+DotEnv.Load(options: new DotEnvOptions(ignoreExceptions: false, envFilePaths: new[] { "../.env" }));
 
 var app = builder.Build();
 
