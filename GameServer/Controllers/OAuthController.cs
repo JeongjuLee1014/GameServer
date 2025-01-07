@@ -26,61 +26,66 @@ namespace GameServer.Controllers
             _gameContext = gameContext;
         }
 
-        [HttpGet("kakao")]
-        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string code)
+        public async Task<IActionResult> ReturnLoginCompleteResponse()
         {
-            string access_token = await _oauthService.RequestAccessTokenFromKakao(code);
-            string user_id = await _oauthService.RequestUserIdFromKakao(access_token);
-            user_id = ((int)(Platform.Kakao)).ToString() + user_id.ToString();
+            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
+            return Content(loginCompleteResponse, "text/html");
+        }
+
+        public async Task ProcessUserLogin(string userId)
+        {
             string sessionId = HttpContext.Session.GetString("SessionId")!;
 
-            if (await isJoined(user_id))
+            if (await isJoined(userId))
             {
-                await Login(user_id, sessionId);
+                await Login(userId, sessionId);
             }
             else
             {
-                await Join(user_id, sessionId);
+                await Join(userId, sessionId);
             }
+        }
 
-            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
-            return Content(loginCompleteResponse, "text/html");
+        [HttpGet("kakao")]
+        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string code)
+        {
+            string accessToken = await _oauthService.RequestAccessTokenFromKakao(code);
+            string userId = await _oauthService.RequestUserIdFromKakao(accessToken);
+            userId = ((int)(Platform.Kakao)).ToString() + userId.ToString();
+
+            await ProcessUserLogin(userId);
+
+            return await ReturnLoginCompleteResponse();
         }
 
         [HttpGet("naver")]
         public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string code)
         {
-            string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
-            string user_id = await _oauthService.RequestUserIdFromNaver(access_token);
-            user_id = (((int)(Platform.Naver)).ToString() + user_id.ToString());
-            string sessionId = HttpContext.Session.GetString("SessionId")!;
-            if (await isJoined(user_id))
-            {
-                await Login(user_id, sessionId);
-            }
-            else
-            {
-                await Join(user_id, sessionId);
-            }
-            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
-            return Content(loginCompleteResponse, "text/html");
-        }
-        public async Task<bool> isJoined(string user_id)
-        {
-            return await _gameContext.Users.AnyAsync(user => user.Id == user_id);
+            string accessToken = await _oauthService.RequestAccessTokenFromNaver(code);
+            string userId = await _oauthService.RequestUserIdFromNaver(accessToken);
+            userId = (((int)(Platform.Naver)).ToString() + userId.ToString());
+
+            await ProcessUserLogin(userId);
+
+            return await ReturnLoginCompleteResponse();
         }
 
-        public async Task<IActionResult> Login(string user_id, string session_id)
+        public async Task<bool> isJoined(string userId)
+        {
+            return await _gameContext.Users.AnyAsync(user => user.Id == userId);
+        }
+
+        public async Task<IActionResult> Login(string userId, string sessionId)
         {
             // user의 session_id 값을 업데이트
-            var user = await _gameContext.Users.FindAsync(user_id);
+            var user = await _gameContext.Users.FindAsync(userId);
 
             if (user == null)
             {
                 return BadRequest();
             }
 
-            user.SessionId = session_id;
+            user.SessionId = sessionId;
 
             _gameContext.Entry(user).State = EntityState.Modified;
 
@@ -90,7 +95,7 @@ namespace GameServer.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(user_id))
+                if (!UserExists(userId))
                 {
                     return NotFound();
                 }
@@ -103,11 +108,11 @@ namespace GameServer.Controllers
             return NoContent();
         }
 
-        public async Task Join(string user_id, string session_id)
+        public async Task Join(string userId, string session_id)
         {
             await _gameContext.Users.AddAsync(new User
             {
-                Id = user_id,
+                Id = userId,
                 NickName = "",
                 SessionId = session_id
             });
