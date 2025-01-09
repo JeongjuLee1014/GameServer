@@ -7,15 +7,16 @@ namespace kakaoTemp.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        public IActionResult RedirectTo(string url, string sessionID)
-        {
-            HttpContext.Session.SetString("SessionId", sessionID);
-            return Redirect(url);
-        }
+        // RedirectTo*Login process client's login request
+        // 1. set session id
+        // 2. create url for redirection
+        // 3. return redirection response
 
         [HttpGet("kakao")]
         public IActionResult RedirectToKakaoLogin([FromQuery] string sessionID)
         {
+            HttpContext.Session.SetString("SessionId", sessionID);
+
             const string clientId = ApiConstants.KAKAO_APP_KEY;
             const string redirectUri = ApiConstants.SERVER_URL + "/oauth/kakao";
             const string responseType = "code";
@@ -25,12 +26,14 @@ namespace kakaoTemp.Controllers
                 "&redirect_uri=" + redirectUri +
                 "&response_type=" + responseType;
 
-            return RedirectTo(redirectUrl, sessionID);
+            return Redirect(redirectUrl);
         }
 
         [HttpGet("naver")]
         public IActionResult RedirectToNaverLogin([FromQuery] string sessionID)
         {
+            HttpContext.Session.SetString("SessionId", sessionID);
+
             const string clientId = ApiConstants.NAVER_APP_KEY;
             const string redirectUri = ApiConstants.SERVER_URL + "/oauth/naver";
             const string responseType = "code";
@@ -42,12 +45,14 @@ namespace kakaoTemp.Controllers
                 "&redirect_uri=" + redirectUri +
                 "&state=" + state;
 
-            return RedirectTo(redirectUrl, sessionID);
+            return Redirect(redirectUrl);
         }
 
         [HttpGet("google")]
         public IActionResult RedirectToGoogleLogin([FromQuery] string sessionID)
         {
+            HttpContext.Session.SetString("SessionId", sessionID);
+
             const string clientId = ApiConstants.GOOGLE_APP_KEY;
             const string redirectUri = ApiConstants.SERVER_URL + "/oauth/google";
             const string responseType = "code";
@@ -59,7 +64,7 @@ namespace kakaoTemp.Controllers
                 "&response_type=" + responseType +
                 "&scope=" + scope;
 
-            return RedirectTo(redirectUrl, sessionID);
+            return Redirect(redirectUrl);
         }
     }
 }

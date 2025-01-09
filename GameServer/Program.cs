@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Controller Service
-builder.Services.AddControllers();
+builder.Services.AddControllers();        
 
 // Add OAuth Service
 builder.Services.AddHttpClient();
@@ -28,9 +28,15 @@ builder.Services.AddSession(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
+
 app.UseSession();
+
 app.UseRouting();
+
 app.MapControllers();
+
 app.Run();

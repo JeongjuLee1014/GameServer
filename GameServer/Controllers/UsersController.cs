@@ -15,13 +15,6 @@ namespace GameServer.Controllers
             _context = context;
         }
 
-        // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
-
         [HttpGet("session/{sessionId}")]
         public ActionResult<User> GetUser(string sessionId)
         {
@@ -38,7 +31,6 @@ namespace GameServer.Controllers
         [HttpPut("session/{sessionId}")]
         public async Task<IActionResult> PutUser(string sessionId, User user)
         {
-            // Find the user with the given sessionId
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
 
             if (existingUser == null)
@@ -61,8 +53,6 @@ namespace GameServer.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
@@ -72,7 +62,6 @@ namespace GameServer.Controllers
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
