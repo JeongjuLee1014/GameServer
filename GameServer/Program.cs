@@ -5,7 +5,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Controller Service
-builder.Services.AddControllers();        
+builder.Services.AddControllers();
+
+// Add Swagger Service
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Add OAuth Service
 builder.Services.AddHttpClient();
@@ -28,6 +32,12 @@ builder.Services.AddSession(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseSwagger();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 
