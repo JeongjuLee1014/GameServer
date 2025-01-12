@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using GameServer;
+using System.Diagnostics;
 
 namespace kakaoTemp.Controllers
 {
@@ -6,57 +8,95 @@ namespace kakaoTemp.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        [HttpGet("kakao")]
-        public IActionResult RedirectToKakaoLogin([FromQuery] string session_id)
-        {
-            HttpContext.Session.SetString("SessionId", session_id);
+        // RedirectTo*Login process client's login request
+        // 1. set session id
+        // 2. create url for redirection
+        // 3. return redirection response
 
-            const string client_id = "49209eb683ce3a79ad35d14c2dc39b60";
-            const string redirect_uri = "https://localhost:7032/oauth/kakao";
-            const string response_type = "code";
+        private IActionResult HandleLogin(string sessionID)
+        {
+            if (string.IsNullOrEmpty(sessionID))
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Screens/retryLoginPage.html");
+                //if (!System.IO.File.Exists(filePath))
+                //{
+                //    return StatusCode(500, "Retry page not found.");
+                //}
+                return PhysicalFile(filePath, "text/html");
+            }
+
+            return null;
+        }
+
+        [HttpGet("kakao")]
+        public IActionResult RedirectToKakaoLogin([FromQuery] string? sessionID)
+        {
+            var validationResult = HandleLogin(sessionID);
+            if (validationResult != null)
+            {
+                return validationResult; // sessionID가 유효하지 않은 경우 처리
+            }
+
+            HttpContext.Session.SetString("SessionId", sessionID);
+
+            const string clientId = ApiConstants.KAKAO_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/kakao";
+            const string responseType = "code";
 
             const string redirectUrl = "https://kauth.kakao.com/oauth/authorize" +
-                "?client_id=" + client_id +
-                "&redirect_uri=" + redirect_uri +
-                "&response_type=" + response_type;
+                "?client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&response_type=" + responseType;
 
             return Redirect(redirectUrl);
         }
 
         [HttpGet("naver")]
-        public IActionResult RedirectToNaverLogin([FromQuery] string session_id)
+        public IActionResult RedirectToNaverLogin([FromQuery] string? sessionID)
         {
-            HttpContext.Session.SetString("SessionId", session_id);
+            var validationResult = HandleLogin(sessionID);
+            if (validationResult != null)
+            {
+                return validationResult; // sessionID가 유효하지 않은 경우 처리
+            }
 
-            const string client_id = "pKaHA3PgKs1zqls08bAy";
-            const string redirect_uri = "https://localhost:7032/oauth/naver";
-            const string response_type = "code";
+            HttpContext.Session.SetString("SessionId", sessionID);
+
+            const string clientId = ApiConstants.NAVER_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/naver";
+            const string responseType = "code";
             const string state = "1234";
 
-            const string redirectUrl = "https://nid.naver.com/oauth2.0/authorize"
-                + "?response_type=" + response_type
-                + "&client_id=" + client_id
-                + "&redirect_uri=" + redirect_uri
-                + "&state=" + state;
+            const string redirectUrl = "https://nid.naver.com/oauth2.0/authorize" +
+                "?response_type=" + responseType +
+                "&client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&state=" + state;
 
             return Redirect(redirectUrl);
         }
 
         [HttpGet("google")]
-        public IActionResult RedirectToGoogleLogin([FromQuery] string session_id)
+        public IActionResult RedirectToGoogleLogin([FromQuery] string? sessionID)
         {
-            HttpContext.Session.SetString("SessionId", session_id);
+            var validationResult = HandleLogin(sessionID);
+            if (validationResult != null)
+            {
+                return validationResult; // sessionID가 유효하지 않은 경우 처리
+            }
 
-            const string client_id = "631548192030-u31u1vn5o4343nh85ksuvrge72l6aq9s.apps.googleusercontent.com";
-            const string redirect_uri = "https://localhost:7032/oauth/google";
-            const string response_type = "code";
+            HttpContext.Session.SetString("SessionId", sessionID);
+
+            const string clientId = ApiConstants.GOOGLE_APP_KEY;
+            const string redirectUri = ApiConstants.SERVER_URL + "/oauth/google";
+            const string responseType = "code";
             const string scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
 
-            string redirectUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
-            "?client_id=" + client_id +
-            "&redirect_uri=" + redirect_uri +
-            "&response_type=" + response_type +
-            "&scope=" + scope;
+            const string redirectUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
+                "?client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&response_type=" + responseType +
+                "&scope=" + scope;
 
             return Redirect(redirectUrl);
         }

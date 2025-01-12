@@ -3,6 +3,7 @@ using GameServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameServer.Migrations
 {
     [DbContext(typeof(GameContext))]
-    partial class GameContextModelSnapshot : ModelSnapshot
+    [Migration("20250108112908_test")]
+    partial class test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,15 +36,6 @@ namespace GameServer.Migrations
                     b.Property<string>("SessionId")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int>("numCoins")
-                        .HasColumnType("int");
-
-                    b.Property<int>("numEnergies")
-                        .HasColumnType("int");
-
-                    b.Property<int>("numStars")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>앱으로 돌아가기 버튼</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 화면 전체 높이를 사용 */
+            margin: 0; /* 기본 여백 제거 */
+            font-family: Arial, sans-serif; /* 적당한 폰트 지정 */
+            text-align: center;
+            background-color: #f9f9f9; /* 배경 색상 추가 (선택 사항) */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* 컨테이너 내부의 콘텐츠를 위쪽으로 정렬 */
+            align-items: center;
+            width: 90%; /* 화면 너비의 90%를 사용 */
+            max-width: 400px; /* 최대 너비 제한 */
+            padding: 20px; /* 내부 여백 */
+            box-sizing: border-box; /* 패딩 포함 너비 계산 */
+            background-color: #ffffff; /* 배경 색상 */
+            border-radius: 8px; /* 둥근 모서리 추가 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
+            transform: translateY(-30px); /* 화면 중앙에서 10px 위로 이동 */
+        }
+
+        h1 {
+            margin: 0 0 10px; /* 아래쪽에만 여백 추가 */
+            font-size: 1.5rem; /* 적당한 크기 지정 */
+            word-wrap: break-word; /* 긴 단어를 줄바꿈 */
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>로그인을 다시 시도해 주세요</h1>
+        <button onclick="window.location.href='앱으로돌아갈주소'">앱으로 돌아가기</button>
+    </div>
+</body>
+</html>

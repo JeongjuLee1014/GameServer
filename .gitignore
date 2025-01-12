@@ -361,3 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+### 환경변수
+.env
+
+### 앱 키
+ApiConstants.cs
+
+### 앱 세팅
+appsettings.json

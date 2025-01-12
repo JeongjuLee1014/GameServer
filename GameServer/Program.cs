@@ -4,18 +4,19 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+// Add Controller Service
+builder.Services.AddControllers();        
 
 // Add OAuth Service
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<OAuthService>();
 
+// Add DbContext Service
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 39));
 builder.Services.AddDbContext<GameContext>(opt => opt.UseMySql(connectionString, serverVersion));
 
+// Add Session Service
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
