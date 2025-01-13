@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using GameServer;
+using System.Diagnostics;
 
 namespace kakaoTemp.Controllers
 {
@@ -12,9 +13,30 @@ namespace kakaoTemp.Controllers
         // 2. create url for redirection
         // 3. return redirection response
 
-        [HttpGet("kakao")]
-        public IActionResult RedirectToKakaoLogin([FromQuery] string sessionID)
+        private IActionResult HandleLogin(string sessionID)
         {
+            if (string.IsNullOrEmpty(sessionID))
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Screens/retryLoginPage.html");
+                //if (!System.IO.File.Exists(filePath))
+                //{
+                //    return StatusCode(500, "Retry page not found.");
+                //}
+                return PhysicalFile(filePath, "text/html");
+            }
+
+            return null;
+        }
+
+        [HttpGet("kakao")]
+        public IActionResult RedirectToKakaoLogin([FromQuery] string? sessionID)
+        {
+            var validationResult = HandleLogin(sessionID);
+            if (validationResult != null)
+            {
+                return validationResult; // sessionID가 유효하지 않은 경우 처리
+            }
+
             HttpContext.Session.SetString("SessionId", sessionID);
 
             const string clientId = ApiConstants.KAKAO_APP_KEY;
@@ -30,8 +52,14 @@ namespace kakaoTemp.Controllers
         }
 
         [HttpGet("naver")]
-        public IActionResult RedirectToNaverLogin([FromQuery] string sessionID)
+        public IActionResult RedirectToNaverLogin([FromQuery] string? sessionID)
         {
+            var validationResult = HandleLogin(sessionID);
+            if (validationResult != null)
+            {
+                return validationResult; // sessionID가 유효하지 않은 경우 처리
+            }
+
             HttpContext.Session.SetString("SessionId", sessionID);
 
             const string clientId = ApiConstants.NAVER_APP_KEY;
@@ -49,8 +77,14 @@ namespace kakaoTemp.Controllers
         }
 
         [HttpGet("google")]
-        public IActionResult RedirectToGoogleLogin([FromQuery] string sessionID)
+        public IActionResult RedirectToGoogleLogin([FromQuery] string? sessionID)
         {
+            var validationResult = HandleLogin(sessionID);
+            if (validationResult != null)
+            {
+                return validationResult; // sessionID가 유효하지 않은 경우 처리
+            }
+
             HttpContext.Session.SetString("SessionId", sessionID);
 
             const string clientId = ApiConstants.GOOGLE_APP_KEY;

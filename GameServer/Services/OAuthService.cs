@@ -18,6 +18,10 @@ namespace GameServer.Services
             _httpClient = httpClient;
         }
 
+        private void HandleErrorResponse(HttpResponseMessage response)
+        {
+
+        }
         public async Task<string> RequestAccessTokenFromKakao(string authorizationCode)
         {
             const string grantType = "authorization_code";
@@ -38,7 +42,15 @@ namespace GameServer.Services
 
             var response = await _httpClient.PostAsync(url, content);
 
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                HandleErrorResponse(response);
+            }
+            
 
             var responseString = await response.Content.ReadAsStringAsync();
             var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);

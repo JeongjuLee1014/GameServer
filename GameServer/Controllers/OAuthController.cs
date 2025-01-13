@@ -12,6 +12,14 @@ namespace GameServer.Controllers
         private readonly OAuthService _oauthService;
         private readonly GameContext _gameContext;
 
+        // 로그인 플랫폼에 대한 상수 정의
+        public enum Platform
+        {
+            Kakao = 1,
+            Google,
+            Naver
+        }
+
         public OAuthController(OAuthService oauthService, GameContext gameContext)
         {
             _oauthService = oauthService;
@@ -67,8 +75,26 @@ namespace GameServer.Controllers
 
         public async Task<IActionResult> ReturnLoginCompleteResponse()
         {
-            var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
-            return Content(loginCompleteResponse, "text/html");
+            try
+            {
+                var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
+                return Content(loginCompleteResponse, "text/html");
+            }
+            catch (FileNotFoundException)
+            {
+                var errorResponse = "<html><body><h1>로그인 완료. 앱으로 돌아가세요.</h1></body></html>";
+                return Content(errorResponse, "text/html");
+            }
+            catch (DirectoryNotFoundException)
+            {
+                var errorResponse = "<html><body><h1>로그인 완료. 앱으로 돌아가세요.</h1></body></html>";
+                return Content(errorResponse, "text/html");
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = $"<html><body><h1>로그인 완료. 앱으로 돌아가세요.</h1></body></html>";
+                return Content(errorResponse, "text/html");
+            }
         }
 
         public async Task<bool> isJoined(string userId)
@@ -83,6 +109,12 @@ namespace GameServer.Controllers
             if (user == null)
             {
                 return BadRequest();
+            }
+
+            // 두 기기에서 같은 계정으로 로그인할 때 먼저 로그인한 기기에서 로그아웃되게
+            if (!string.IsNullOrEmpty(user.SessionId))
+            {
+                await Logout(user.SessionId);
             }
 
             user.SessionId = sessionId;
@@ -108,16 +140,67 @@ namespace GameServer.Controllers
             return NoContent();
         }
 
-        public async Task Join(string userId, string sessionId)
-        {
-            await _gameContext.Users.AddAsync(new User
-            {
-                Id = userId,
-                NickName = "",
-                SessionId = sessionId
-            });
 
-            await _gameContext.SaveChangesAsync();
+        // 해당 메서드 체크할 필요 O
+        private async Task Logout(string sessionId)
+        {
+            // 로그아웃 처리 로직 (예: 해당 세션에 대한 추가 작업)
+            var userToLogout = await _gameContext.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
+
+            if (userToLogout != null)
+            {
+                // 세션 종료 (세션 ID를 비워놓기)
+                userToLogout.SessionId = null;
+
+                // 이후 처리법
+
+                // 데이터베이스에 변경 사항 반영
+                _gameContext.Entry(userToLogout).State = EntityState.Modified;
+                await _gameContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IActionResult> Join(string userId, string sessionId)
+        {
+            try
+            {
+                await _gameContext.Users.AddAsync(new User
+                {
+                    Id = userId,
+                    NickName = "",
+                    SessionId = sessionId
+                });
+            }
+            catch (DbUpdateException)
+            {
+                if (UserExists(userId))
+                {
+                    // 이미 존재하는 userId -> 이 경우가 있을 가능성이 거의 없음
+                    return await Login(userId, sessionId);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            try
+            {
+                await _gameContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(userId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
         private bool UserExists(string id)
