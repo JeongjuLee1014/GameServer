@@ -24,7 +24,7 @@ namespace GameServer.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(long id)
+        public async Task<ActionResult<UserDTO>> GetUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -33,20 +33,20 @@ namespace GameServer.Controllers
                 return NotFound();
             }
 
-            return user;
+            return UserToDTO(user);
         }
 
         [HttpGet("session/{sessionId}")]
-        public ActionResult<User> GetUser(string sessionId)
+        public ActionResult<UserDTO> GetUser(string sessionId)
         {
-            var user = _context.Users.FirstOrDefault(u => u.SessionId == sessionId);
+            var user = _context.Users.FirstOrDefault(u => u.sessionId == sessionId);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return UserToDTO(user);
         }
 
         // PUT: api/Users/5
@@ -84,14 +84,14 @@ namespace GameServer.Controllers
         public async Task<IActionResult> PutUser(string sessionId, User user)
         {
             // Find the user with the given sessionId
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.sessionId == sessionId);
 
             if (existingUser == null)
             {
                 return NotFound(new { Message = "User not found." });
             }
 
-            existingUser.NickName = user.NickName;
+            existingUser.nickName = user.nickName;
 
             try
             {
@@ -114,7 +114,7 @@ namespace GameServer.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return CreatedAtAction("GetUser", new { id = user.id }, user);
         }
 
         // DELETE: api/Users/5
@@ -135,7 +135,17 @@ namespace GameServer.Controllers
 
         private bool UserExists(string id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.id == id);
         }
+
+        private static UserDTO UserToDTO(User user) =>
+        new UserDTO
+        {
+            nickName = user.nickName,
+            sessionId = user.sessionId,
+            numCoins = user.numCoins,
+            numStars = user.numStars,
+            numEnergies = user.numEnergies
+        };
     }
 }
