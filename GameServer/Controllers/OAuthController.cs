@@ -77,7 +77,7 @@ namespace GameServer.Controllers
         {
             try
             {
-                var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./loginCompletePage.html");
+                var loginCompleteResponse = await System.IO.File.ReadAllTextAsync("./ResponsePages/loginCompletePage.html");
                 return Content(loginCompleteResponse, "text/html");
             }
             catch (FileNotFoundException)
