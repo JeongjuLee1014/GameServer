@@ -2,12 +2,12 @@
 {
     public class User
     {
-        public required string id { get; set; }
-        public required string nickName { get; set; }
-        public required string sessionId { get; set; }
+        public required string Id { get; set; }
+        public required string NickName { get; set; }
+        public required string SessionId { get; set; }
         
-        public int numCoins {  get; set; }
-        public int numStars {  get; set; }
-        public int numEnergies { get; set; }
+        public int NumCoins {  get; set; }
+        public int NumStars {  get; set; }
+        public int NumEnergies { get; set; }
     }
 }

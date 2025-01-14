@@ -201,7 +201,7 @@ namespace GameServer.Controllers
 
         public async Task<bool> isJoined(string userId)
         {
-            return await _gameContext.Users.AnyAsync(user => user.id == userId);
+            return await _gameContext.Users.AnyAsync(user => user.Id == userId);
         }
 
         public async Task<IActionResult> Login(string userId, string sessionId)
@@ -214,12 +214,12 @@ namespace GameServer.Controllers
             }
 
             // 두 기기에서 같은 계정으로 로그인할 때 먼저 로그인한 기기에서 로그아웃되게
-            if (!string.IsNullOrEmpty(user.sessionId))
+            if (!string.IsNullOrEmpty(user.SessionId))
             {
-                await Logout(user.sessionId);
+                await Logout(user.SessionId);
             }
 
-            user.sessionId = sessionId;
+            user.SessionId = sessionId;
 
             _gameContext.Entry(user).State = EntityState.Modified;
 
@@ -247,12 +247,12 @@ namespace GameServer.Controllers
         private async Task Logout(string sessionId)
         {
             // 로그아웃 처리 로직 (예: 해당 세션에 대한 추가 작업)
-            var userToLogout = await _gameContext.Users.FirstOrDefaultAsync(u => u.sessionId == sessionId);
+            var userToLogout = await _gameContext.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
 
             if (userToLogout != null)
             {
                 // 세션 종료 (세션 ID를 비워놓기)
-                userToLogout.sessionId = null;
+                userToLogout.SessionId = null;
 
                 // 이후 처리법
 
@@ -268,9 +268,9 @@ namespace GameServer.Controllers
             {
                 await _gameContext.Users.AddAsync(new User
                 {
-                    id = userId,
-                    nickName = "",
-                    sessionId = sessionId
+                    Id = userId,
+                    NickName = "",
+                    SessionId = sessionId
                 });
             }
             catch (DbUpdateException)
@@ -307,7 +307,7 @@ namespace GameServer.Controllers
 
         private bool UserExists(string id)
         {
-            return _gameContext.Users.Any(e => e.id == id);
+            return _gameContext.Users.Any(e => e.Id == id);
         }
     }
 }

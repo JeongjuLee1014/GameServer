@@ -39,7 +39,7 @@ namespace GameServer.Controllers
         [HttpGet("session/{sessionId}")]
         public ActionResult<UserDTO> GetUser(string sessionId)
         {
-            var user = _context.Users.FirstOrDefault(u => u.sessionId == sessionId);
+            var user = _context.Users.FirstOrDefault(u => u.SessionId == sessionId);
 
             if (user == null)
             {
@@ -84,14 +84,14 @@ namespace GameServer.Controllers
         public async Task<IActionResult> PutUser(string sessionId, User user)
         {
             // Find the user with the given sessionId
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.sessionId == sessionId);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
 
             if (existingUser == null)
             {
                 return NotFound(new { Message = "User not found." });
             }
 
-            existingUser.nickName = user.nickName;
+            existingUser.NickName = user.NickName;
 
             try
             {
@@ -114,7 +114,7 @@ namespace GameServer.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.id }, user);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
         // DELETE: api/Users/5
@@ -135,17 +135,17 @@ namespace GameServer.Controllers
 
         private bool UserExists(string id)
         {
-            return _context.Users.Any(e => e.id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
 
         private static UserDTO UserToDTO(User user) =>
         new UserDTO
         {
-            nickName = user.nickName,
-            sessionId = user.sessionId,
-            numCoins = user.numCoins,
-            numStars = user.numStars,
-            numEnergies = user.numEnergies
+            NickName = user.NickName,
+            SessionId = user.SessionId,
+            NumCoins = user.NumCoins,
+            NumStars = user.NumStars,
+            NumEnergies = user.NumEnergies
         };
     }
 }
