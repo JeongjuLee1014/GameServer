@@ -13,21 +13,6 @@ namespace kakaoTemp.Controllers
         // 2. create url for redirection
         // 3. return redirection response
 
-        private IActionResult HandleLogin(string sessionID)
-        {
-            if (string.IsNullOrEmpty(sessionID))
-            {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/retryLoginPage.html");
-                //if (!System.IO.File.Exists(filePath))
-                //{
-                //    return StatusCode(500, "Retry page not found.");
-                //}
-                return PhysicalFile(filePath, "text/html");
-            }
-
-            return null;
-        }
-
         [HttpGet("kakao")]
         public IActionResult RedirectToKakaoLogin([FromQuery] string? sessionID)
         {
@@ -99,6 +84,22 @@ namespace kakaoTemp.Controllers
                 "&scope=" + scope;
 
             return Redirect(redirectUrl);
+        }
+
+        // 
+        private IActionResult HandleLogin(string sessionID)
+        {
+            if (string.IsNullOrEmpty(sessionID))
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/retryLoginPage.html");
+                //if (!System.IO.File.Exists(filePath))
+                //{
+                //    return StatusCode(500, "Retry page not found.");
+                //}
+                return PhysicalFile(filePath, "text/html");
+            }
+
+            return null;
         }
     }
 }

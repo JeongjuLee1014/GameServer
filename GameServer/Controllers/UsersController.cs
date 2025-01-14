@@ -24,7 +24,7 @@ namespace GameServer.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(long id)
+        public async Task<ActionResult<UserDTO>> GetUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -33,11 +33,11 @@ namespace GameServer.Controllers
                 return NotFound();
             }
 
-            return user;
+            return UserToDTO(user);
         }
 
         [HttpGet("session/{sessionId}")]
-        public ActionResult<User> GetUser(string sessionId)
+        public ActionResult<UserDTO> GetUser(string sessionId)
         {
             var user = _context.Users.FirstOrDefault(u => u.SessionId == sessionId);
 
@@ -46,7 +46,7 @@ namespace GameServer.Controllers
                 return NotFound();
             }
 
-            return user;
+            return UserToDTO(user);
         }
 
         // PUT: api/Users/5
@@ -137,5 +137,15 @@ namespace GameServer.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+
+        private static UserDTO UserToDTO(User user) =>
+        new UserDTO
+        {
+            NickName = user.NickName,
+            SessionId = user.SessionId,
+            NumCoins = user.NumCoins,
+            NumStars = user.NumStars,
+            NumEnergies = user.NumEnergies
+        };
     }
 }
