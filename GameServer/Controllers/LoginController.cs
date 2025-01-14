@@ -17,7 +17,7 @@ namespace kakaoTemp.Controllers
         {
             if (string.IsNullOrEmpty(sessionID))
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Screens/retryLoginPage.html");
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/retryLoginPage.html");
                 //if (!System.IO.File.Exists(filePath))
                 //{
                 //    return StatusCode(500, "Retry page not found.");
