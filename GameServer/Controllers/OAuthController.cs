@@ -27,36 +27,138 @@ namespace GameServer.Controllers
         }
 
         [HttpGet("kakao")]
-        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string code)
+        public async Task<IActionResult> HandleKakaoOAuthRedirect([FromQuery] string? code, [FromQuery] string? error)
         {
-            string accessToken = await _oauthService.RequestAccessTokenFromKakao(code);
-            string userId = await _oauthService.RequestUserIdFromKakao(accessToken);
-            
-            await ProcessUserLogin(userId);
-            
-            return await ReturnLoginCompleteResponse();
+            if (!string.IsNullOrEmpty(error))
+            {
+                // 인가 코드 받기 요청을 실패
+                // 1. 사용자가 동의 화면에서 취소하여 로그인을 취소
+                // 2. 모종의 에러 발생
+
+                // 하나의 페이지로 처리하지 말고 응답 코드 분류하여 처리하는 게 좋을 듯
+                try
+                {
+                    var loginCodeResponse = await System.IO.File.ReadAllTextAsync("./ResponsePages/failLoginPage.html");
+                    return Content(loginCodeResponse, "text/html");
+                }
+                catch (FileNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (Exception ex)
+                {
+                    var errorResponse = $"<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+            }
+
+            try
+            {
+                string accessToken = await _oauthService.RequestAccessTokenFromKakao(code);
+                string userId = await _oauthService.RequestUserIdFromKakao(accessToken);
+
+                await ProcessUserLogin(userId);
+
+                return await ReturnLoginCompleteResponse();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing Kakao login.", detail = ex.Message });
+            }
         }
 
         [HttpGet("google")]
-        public async Task<IActionResult> HandleGoogleOAuthRedirect([FromQuery] string code)
+        public async Task<IActionResult> HandleGoogleOAuthRedirect([FromQuery] string? code, [FromQuery] string? error)
         {
-            string access_token = await _oauthService.RequestAccessTokenFromGoogle(code);
-            string userId = await _oauthService.RequestUserIdFromGoogle(access_token);
-            
-            await ProcessUserLogin(userId);
-            
-            return await ReturnLoginCompleteResponse();
+            if (!string.IsNullOrEmpty(error))
+            {
+                // error: 오류 요청 나타내는 문자열. ex) access_denied, invalid_request, etc.
+                // error_description: 오류에 대한 자세한 요청
+                // state: 단순 요청 무결성 확인용
+                try
+                {
+                    var loginCodeResponse = await System.IO.File.ReadAllTextAsync("./ResponsePages/failLoginPage.html");
+                    return Content(loginCodeResponse, "text/html");
+                }
+                catch (FileNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (Exception ex)
+                {
+                    var errorResponse = $"<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+            }
+
+            try
+            {
+                string access_token = await _oauthService.RequestAccessTokenFromGoogle(code);
+                string userId = await _oauthService.RequestUserIdFromGoogle(access_token);
+
+                await ProcessUserLogin(userId);
+
+                return await ReturnLoginCompleteResponse();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing Kakao login.", detail = ex.Message });
+            }
         }
 
         [HttpGet("naver")]
-        public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string code)
+        public async Task<IActionResult> HandleNaverOAuthRedirect([FromQuery] string? code, [FromQuery] string? error)
         {
-            string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
-            string userId = await _oauthService.RequestUserIdFromNaver(access_token);
-            
-            await ProcessUserLogin(userId);
-            
-            return await ReturnLoginCompleteResponse();
+            if (!string.IsNullOrEmpty(error))
+            {
+                // google과 동일
+                try
+                {
+                    var loginCodeResponse = await System.IO.File.ReadAllTextAsync("./ResponsePages/failLoginPage.html");
+                    return Content(loginCodeResponse, "text/html");
+                }
+                catch (FileNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (Exception ex)
+                {
+                    var errorResponse = $"<html><body><h1>로그인 실패. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+            }
+
+            try
+            {
+                string access_token = await _oauthService.RequestAccessTokenFromNaver(code);
+                string userId = await _oauthService.RequestUserIdFromNaver(access_token);
+
+                await ProcessUserLogin(userId);
+
+                return await ReturnLoginCompleteResponse();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing Kakao login.", detail = ex.Message });
+            }
         }
 
         public async Task ProcessUserLogin(string userId)
