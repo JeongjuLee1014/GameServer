@@ -14,15 +14,15 @@ namespace kakaoTemp.Controllers
         // 3. return redirection response
 
         [HttpGet("kakao")]
-        public IActionResult RedirectToKakaoLogin([FromQuery] string? sessionID)
+        public IActionResult RedirectToKakaoLogin([FromQuery] string? sessionId)
         {
-            var validationResult = HandleLogin(sessionID);
+            var validationResult = HandleLogin(sessionId);
             if (validationResult != null)
             {
                 return validationResult; // sessionID가 유효하지 않은 경우 처리
             }
 
-            HttpContext.Session.SetString("SessionId", sessionID);
+            HttpContext.Session.SetString("SessionId", sessionId);
 
             const string clientId = ApiConstants.KAKAO_APP_KEY;
             const string redirectUri = ApiConstants.SERVER_URL + "/oauth/kakao";
@@ -37,15 +37,15 @@ namespace kakaoTemp.Controllers
         }
 
         [HttpGet("naver")]
-        public IActionResult RedirectToNaverLogin([FromQuery] string? sessionID)
+        public IActionResult RedirectToNaverLogin([FromQuery] string? sessionId)
         {
-            var validationResult = HandleLogin(sessionID);
+            var validationResult = HandleLogin(sessionId);
             if (validationResult != null)
             {
                 return validationResult; // sessionID가 유효하지 않은 경우 처리
             }
 
-            HttpContext.Session.SetString("SessionId", sessionID);
+            HttpContext.Session.SetString("SessionId", sessionId);
 
             const string clientId = ApiConstants.NAVER_APP_KEY;
             const string redirectUri = ApiConstants.SERVER_URL + "/oauth/naver";
@@ -62,15 +62,15 @@ namespace kakaoTemp.Controllers
         }
 
         [HttpGet("google")]
-        public IActionResult RedirectToGoogleLogin([FromQuery] string? sessionID)
+        public IActionResult RedirectToGoogleLogin([FromQuery] string? sessionId)
         {
-            var validationResult = HandleLogin(sessionID);
+            var validationResult = HandleLogin(sessionId);
             if (validationResult != null)
             {
                 return validationResult; // sessionID가 유효하지 않은 경우 처리
             }
 
-            HttpContext.Session.SetString("SessionId", sessionID);
+            HttpContext.Session.SetString("SessionId", sessionId);
 
             const string clientId = ApiConstants.GOOGLE_APP_KEY;
             const string redirectUri = ApiConstants.SERVER_URL + "/oauth/google";
@@ -86,17 +86,35 @@ namespace kakaoTemp.Controllers
             return Redirect(redirectUrl);
         }
 
-        // 
-        private IActionResult HandleLogin(string sessionID)
+        // sessionID가 null인지 아닌지를 판별하여
+        // null이면 로그인을 재시도하라는 페이지를
+        // null이 아니면 정상작동하라는 반환을 하는 메서드
+        private IActionResult HandleLogin(string sessionId)
         {
-            if (string.IsNullOrEmpty(sessionID))
+            if (string.IsNullOrEmpty(sessionId))
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/retryLoginPage.html");
-                //if (!System.IO.File.Exists(filePath))
-                //{
-                //    return StatusCode(500, "Retry page not found.");
-                //}
-                return PhysicalFile(filePath, "text/html");
+                try
+                {
+                    var retryLoginPath = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/retryLoginPage.html");
+                    var fileContent = System.IO.File.ReadAllText(retryLoginPath);
+                    return Content(fileContent, "text/html");
+
+                }
+                catch (FileNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 재시도 필요. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    var errorResponse = "<html><body><h1>로그인 재시도 필요. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
+                catch (Exception ex)
+                {
+                    var errorResponse = $"<html><body><h1>로그인 재시도 필요. 앱으로 돌아가세요.</h1></body></html>";
+                    return Content(errorResponse, "text/html");
+                }
             }
 
             return null;

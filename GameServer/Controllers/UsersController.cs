@@ -81,7 +81,7 @@ namespace GameServer.Controllers
         //}
 
         [HttpPut("session/{sessionId}")]
-        public async Task<IActionResult> PutUser(string sessionId, User user)
+        public async Task<IActionResult> PutUser(string sessionId, UserDTO user)
         {
             // Find the user with the given sessionId
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);

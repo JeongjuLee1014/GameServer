@@ -16,7 +16,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<OAuthService>();
 
 // Add DbContext Service
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("CloudConnection");
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 39));
 builder.Services.AddDbContext<GameContext>(opt => opt.UseMySql(connectionString, serverVersion));
 

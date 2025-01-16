@@ -18,10 +18,6 @@ namespace GameServer.Services
             _httpClient = httpClient;
         }
 
-        private void HandleErrorResponse(HttpResponseMessage response)
-        {
-
-        }
         public async Task<string> RequestAccessTokenFromKakao(string authorizationCode)
         {
             const string grantType = "authorization_code";
@@ -40,21 +36,31 @@ namespace GameServer.Services
 
             var content = new FormUrlEncodedContent(payload);
 
-            var response = await _httpClient.PostAsync(url, content);
-
+            // Http 예외
+            HttpResponseMessage response;
             try
             {
+                response = await _httpClient.PostAsync(url, content);
                 response.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException e)
             {
-                HandleErrorResponse(response);
+                throw new Exception($"Failed to get response: {e.Message}");
             }
-            
 
+            // Json 예외
+            Dictionary<string, JsonElement>? responseJson;
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            try
+            {
+                responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            }
+            catch (JsonException e)
+            {
+                throw new Exception($"Failed to parse response JSON: {e.Message}");
+            }
 
+            // access token 추출
             if (responseJson != null && responseJson.TryGetValue("access_token", out var accessTokenElement))
             {
                 return accessTokenElement.GetString()!;
@@ -70,12 +76,27 @@ namespace GameServer.Services
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                throw new Exception($"Failed to fetch user information from Kakao API: {e.Message}");
+            }
 
-            response.EnsureSuccessStatusCode();
-
+            Dictionary<string, JsonElement>? responseJson;
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            try
+            {
+                responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            }
+            catch (JsonException e)
+            {
+                throw new Exception($"Failed to parse response JSON: {e.Message}");
+            }
 
             if (responseJson != null && responseJson.TryGetValue("id", out var idElement))
             {
@@ -106,12 +127,27 @@ namespace GameServer.Services
 
             var content = new FormUrlEncodedContent(payload);
 
-            var response = await _httpClient.PostAsync(url, content);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                throw new Exception($"Failed to get response: {e.Message}");
+            }
 
-            response.EnsureSuccessStatusCode();
-
+            Dictionary<string, JsonElement>? responseJson;
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            try
+            {
+                responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            }
+            catch (JsonException e)
+            {
+                throw new Exception($"Failed to parse response JSON: {e.Message}");
+            }
 
             if (responseJson != null && responseJson.TryGetValue("access_token", out var accessTokenElement))
             {
@@ -128,12 +164,27 @@ namespace GameServer.Services
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                throw new Exception($"Failed to fetch user information from Google API: {e.Message}");
+            }
 
-            response.EnsureSuccessStatusCode();
-
+            Dictionary<string, JsonElement>? responseJson;
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            try
+            {
+                responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            }
+            catch (JsonException e)
+            {
+                throw new Exception($"Failed to parse response JSON: {e.Message}");
+            }
 
             if (responseJson != null && responseJson.TryGetValue("id", out var idElement))
             {
@@ -164,12 +215,27 @@ namespace GameServer.Services
 
             var content = new FormUrlEncodedContent(payload);
 
-            var response = await _httpClient.PostAsync(url, content);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                throw new Exception($"Failed to get response: {e.Message}");
+            }
 
-            response.EnsureSuccessStatusCode();
-
+            Dictionary<string, JsonElement>? responseJson;
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            try
+            {
+                responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            }
+            catch (JsonException e)
+            {
+                throw new Exception($"Failed to parse response JSON: {e.Message}");
+            }
 
             if (responseJson != null && responseJson.TryGetValue("access_token", out var accessTokenElement))
             {
@@ -187,12 +253,27 @@ namespace GameServer.Services
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                throw new Exception($"Failed to fetch user information from Naver API: {e.Message}");
+            }
 
-            response.EnsureSuccessStatusCode();
-
+            Dictionary<string, JsonElement>? responseJson;
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            try
+            {
+                responseJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseString);
+            }
+            catch (JsonException e)
+            {
+                throw new Exception($"Failed to parse response JSON: {e.Message}");
+            }
 
             if (responseJson != null && responseJson.TryGetValue("response", out var responseElement))
             {
