@@ -38,8 +38,8 @@ namespace GameServer.Controllers
                 // 하나의 페이지로 처리하지 말고 응답 코드 분류하여 처리하는 게 좋을 듯
                 try
                 {
-                    var loginCodeResponse = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/failLoginPage.html");
-                    return Content(loginCodeResponse, "text/html");
+                    var failLoginResponse = Path.Combine(Directory.GetCurrentDirectory(), "ResponsePages/failLoginPage.html");
+                    return Content(failLoginResponse, "text/html");
                 }
                 catch (FileNotFoundException)
                 {
