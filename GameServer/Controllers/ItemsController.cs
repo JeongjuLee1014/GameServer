@@ -41,13 +41,28 @@ namespace GameServer.Controllers
             return ItemToDTO(item);
         }
 
-        //// sessionId를 받아 users 테이블에서 유저를 찾아 user의 id를 얻는다.
-        //// 해당 id를 갖고 있는 items 테이블의 튜플들을 배열로 반환한다.
-        //[HttpGet("session/{sessionId}")]
-        //public async Task<ActionResult<IEnumerable<Item>>> GetItems(string sessionId)
-        //{
+        // sessionId를 받아 users 테이블에서 유저를 찾아 user의 id를 얻는다.
+        // 해당 id를 갖고 있는 items 테이블의 튜플들을 배열로 반환한다.
+        [HttpGet("session/{sessionId}")]
+        public async Task<ActionResult<IEnumerable<Item>>> GetItems(string sessionId)
+        {
+            var user = await _gameContext.Users.FirstOrDefaultAsync(u => u.SessionId == sessionId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var userId = user.Id;
 
-        //}
+            var items = await _gameContext.Items
+                .Where(i => i.UserId == userId)
+                .ToListAsync();
+            if (items == null || !items.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(items);
+        }
 
         // PUT: api/Items/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
