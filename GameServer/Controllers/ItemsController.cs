@@ -29,7 +29,7 @@ namespace GameServer.Controllers
 
         // GET: api/Items/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetItem(string id)
+        public async Task<ActionResult<ItemDTO>> GetItem(string id)
         {
             var item = await _gameContext.Items.FindAsync(id);
 
@@ -38,8 +38,16 @@ namespace GameServer.Controllers
                 return NotFound();
             }
 
-            return item;
+            return ItemToDTO(item);
         }
+
+        //// sessionId를 받아 users 테이블에서 유저를 찾아 user의 id를 얻는다.
+        //// 해당 id를 갖고 있는 items 테이블의 튜플들을 배열로 반환한다.
+        //[HttpGet("session/{sessionId}")]
+        //public async Task<ActionResult<IEnumerable<Item>>> GetItems(string sessionId)
+        //{
+
+        //}
 
         // PUT: api/Items/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -97,10 +105,10 @@ namespace GameServer.Controllers
             return CreatedAtAction("GetItem", new { id = item.UserId }, item);
         }
 
-        // 유저의 최초의 아이템 보드 설정
+        // 유저의 아이템 보드 속 아이템 생성
         //
-        // 유저의 id를 받아 이를 갖는 빈 아이템을 8x7개 만들어
-        // items 테이블의 추가한다.
+        // user id를 받아 이를 갖는 빈 아이템을 8x7개 만들어
+        // items 테이블에 추가한다.
         [HttpPost("{userId}")]
         public async Task<IActionResult> GiveFirstItemTable(string userId)
         {
@@ -163,5 +171,16 @@ namespace GameServer.Controllers
         {
             return _gameContext.Items.Any(e => e.UserId == id);
         }
+
+        private static ItemDTO ItemToDTO(Item item) =>
+        new ItemDTO
+        {
+            State = item.State,
+            Type = item.Type,
+            Name = item.Name,
+            Level = item.Level,
+            X = item.X,
+            Y = item.Y
+        };
     }
 }
