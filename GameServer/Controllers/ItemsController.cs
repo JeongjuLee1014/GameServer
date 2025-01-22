@@ -13,25 +13,25 @@ namespace GameServer.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
-        private readonly GameContext _context;
+        private readonly GameContext _gameContext;
 
-        public ItemsController(GameContext context)
+        public ItemsController(GameContext gameContext)
         {
-            _context = context;
+            _gameContext = gameContext;
         }
 
         // GET: api/Items
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Item>>> GetItems()
         {
-            return await _context.Items.ToListAsync();
+            return await _gameContext.Items.ToListAsync();
         }
 
         // GET: api/Items/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Item>> GetItem(string id)
         {
-            var item = await _context.Items.FindAsync(id);
+            var item = await _gameContext.Items.FindAsync(id);
 
             if (item == null)
             {
@@ -51,11 +51,11 @@ namespace GameServer.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(item).State = EntityState.Modified;
+            _gameContext.Entry(item).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _gameContext.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -77,10 +77,10 @@ namespace GameServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Item>> PostItem(Item item)
         {
-            _context.Items.Add(item);
+            _gameContext.Items.Add(item);
             try
             {
-                await _context.SaveChangesAsync();
+                await _gameContext.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -97,25 +97,71 @@ namespace GameServer.Controllers
             return CreatedAtAction("GetItem", new { id = item.UserId }, item);
         }
 
+        // 유저의 최초의 아이템 보드 설정
+        //
+        // 유저의 id를 받아 이를 갖는 빈 아이템을 8x7개 만들어
+        // items 테이블의 추가한다.
+        [HttpPost("{userId}")]
+        public async Task<IActionResult> GiveFirstItemTable(string userId)
+        {
+
+            for (var row = 0; row < 8; row++)
+            {
+                for (var col = 0; col < 7; col++)
+                {
+                    try
+                    {
+                        await _gameContext.Items.AddAsync(new Item
+                        {
+                            UserId = userId,
+                            State = "",
+                            Type = "",
+                            Name = "",
+                            Level = 1,
+                            X = row,
+                            Y = col
+                        });
+                    }
+                    catch (DbUpdateException)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError,
+                        new { Message = "An error occurred while producing the item table." });
+                    }
+                }
+            }
+
+            try
+            {
+                await _gameContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new { Message = "An error occurred while updating database after producing the item table." });
+            }
+
+            return NoContent();
+        }
+
         // DELETE: api/Items/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(string id)
         {
-            var item = await _context.Items.FindAsync(id);
+            var item = await _gameContext.Items.FindAsync(id);
             if (item == null)
             {
                 return NotFound();
             }
 
-            _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
+            _gameContext.Items.Remove(item);
+            await _gameContext.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool ItemExists(string id)
         {
-            return _context.Items.Any(e => e.UserId == id);
+            return _gameContext.Items.Any(e => e.UserId == id);
         }
     }
 }

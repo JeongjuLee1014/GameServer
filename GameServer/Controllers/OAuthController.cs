@@ -11,6 +11,7 @@ namespace GameServer.Controllers
     {
         private readonly OAuthService _oauthService;
         private readonly GameContext _gameContext;
+        private readonly ItemsController _itemsController;
 
         // 로그인 플랫폼에 대한 상수 정의
         public enum Platform
@@ -20,10 +21,11 @@ namespace GameServer.Controllers
             Naver
         }
 
-        public OAuthController(OAuthService oauthService, GameContext gameContext)
+        public OAuthController(OAuthService oauthService, GameContext gameContext, ItemsController itemsController)
         {
             _oauthService = oauthService;
             _gameContext = gameContext;
+            _itemsController = itemsController;
         }
 
         [HttpGet("kakao")]
@@ -301,6 +303,10 @@ namespace GameServer.Controllers
                     throw;
                 }
             }
+
+            // 아이템 튜플 추가
+            // -> 이걸 타 컨트롤러의 메서드를 바로 호출하는 방식으로 해도 되는가?
+            await _itemsController.GiveFirstItemTable(userId);
 
             return NoContent();
         }
